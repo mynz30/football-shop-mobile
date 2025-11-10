@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:football_shop_mobile/widgets/left_drawer.dart';
+import 'package:football_shop_mobile/screens/productentry_form.dart';
+import 'package:football_shop_mobile/screens/my_products.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
@@ -19,7 +22,9 @@ class MyHomePage extends StatelessWidget {
           ),
         ),
         backgroundColor: Colors.green,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
+      drawer: const LeftDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -53,7 +58,15 @@ class MyHomePage extends StatelessWidget {
                   name: "All Products",
                   icon: Icons.list,
                   color: Colors.blue,
-                  message: "Kamu telah menekan tombol All Products",
+                  onTap: () {
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        const SnackBar(
+                          content: Text("Kamu telah menekan tombol All Products"),
+                        ),
+                      );
+                  },
                 ),
 
                 // Tombol My Products
@@ -61,7 +74,14 @@ class MyHomePage extends StatelessWidget {
                   name: "My Products",
                   icon: Icons.shopping_bag,
                   color: Colors.green,
-                  message: "Kamu telah menekan tombol My Products",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MyProductsPage(),
+                      ),
+                    );
+                  },
                 ),
 
                 // Tombol Create Product
@@ -69,7 +89,14 @@ class MyHomePage extends StatelessWidget {
                   name: "Create Product",
                   icon: Icons.add_box,
                   color: Colors.red,
-                  message: "Kamu telah menekan tombol Create Product",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProductEntryFormPage(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -114,14 +141,14 @@ class ItemCard extends StatelessWidget {
   final String name;
   final IconData icon;
   final Color color;
-  final String message;
+  final VoidCallback onTap;
 
   const ItemCard({
     super.key,
     required this.name,
     required this.icon,
     required this.color,
-    required this.message,
+    required this.onTap,
   });
 
   @override
@@ -130,11 +157,7 @@ class ItemCard extends StatelessWidget {
       color: color,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
-        onTap: () {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(message)));
-        },
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.all(8),
