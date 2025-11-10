@@ -4,92 +4,207 @@
 
 ---
 
-## 1. Apa itu Widget Tree pada Flutter dan bagaimana hubungan parent-child bekerja antar widget?
+## Tugas 8: Flutter Navigation, Layouts, Forms, and Input Elements
 
-**Widget tree** adalah struktur hierarki yang menggambarkan bagaimana semua widget disusun di dalam aplikasi Flutter. Setiap elemen antarmuka pengguna (seperti teks, tombol, atau layout) merupakan **node** dalam pohon tersebut.  
+### 1. Jelaskan perbedaan antara `Navigator.push()` dan `Navigator.pushReplacement()` pada Flutter. Dalam kasus apa sebaiknya masing-masing digunakan pada aplikasi Football Shop kamu?
 
-Hubungan **parent-child (induk-anak)** berarti setiap widget (parent) dapat memiliki satu atau lebih widget di dalamnya (child).  
-Contohnya:
-- `Scaffold` adalah parent dari `AppBar` dan `Body`.
-- `Column` adalah parent dari beberapa widget seperti `Text`, `Row`, atau `Container`.  
+**Perbedaan utama:**
 
-Flutter membangun dan merender UI berdasarkan struktur pohon ini. Jika satu bagian widget berubah, hanya subtree yang relevan yang akan di-render ulang untuk efisiensi.
+| Aspek | `Navigator.push()` | `Navigator.pushReplacement()` |
+|-------|-------------------|------------------------------|
+| **Fungsi** | Menambahkan halaman baru di atas stack navigasi | Mengganti halaman saat ini dengan halaman baru |
+| **Stack** | Halaman lama tetap ada di stack | Halaman lama dihapus dari stack |
+| **Tombol Back** | Bisa kembali ke halaman sebelumnya | Tidak bisa kembali ke halaman sebelumnya |
 
----
+**Penggunaan dalam aplikasi Football Shop:**
 
-## 2. Sebutkan semua widget yang digunakan dalam proyek ini dan jelaskan fungsinya.
+- **`Navigator.push()`** digunakan untuk:
+  - Navigasi dari **Halaman Utama** ke **Form Tambah Produk** (via tombol "Create Product")
+  - User dapat kembali ke halaman utama dengan tombol back
+  - Cocok untuk flow yang memerlukan navigasi hierarkis
+  
+  ```dart
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const ProductEntryFormPage()),
+  );
+  ```
 
-Berikut daftar widget yang digunakan pada proyek **Football Shop Mobile**:
-
-| Widget | Fungsi |
-|--------|---------|
-| `MaterialApp` | Widget root yang menyediakan struktur dasar aplikasi berbasis Material Design. |
-| `Scaffold` | Menyediakan struktur layout utama seperti `AppBar`, `Body`, dan `FloatingActionButton`. |
-| `AppBar` | Menampilkan bar di bagian atas aplikasi yang berisi judul atau tombol navigasi. |
-| `Text` | Menampilkan teks statis di layar. |
-| `Row` | Menyusun widget secara horizontal. |
-| `Column` | Menyusun widget secara vertikal. |
-| `Card` | Menyediakan tampilan seperti kartu untuk menampilkan informasi yang terpisah dengan bayangan (elevation). |
-| `Container` | Membungkus widget lain dan dapat diberi padding, margin, atau warna. |
-| `GridView.count` | Membuat layout grid dengan jumlah kolom tetap (digunakan untuk menampilkan tombol utama). |
-| `Material` | Memberikan efek Material Design seperti warna dan bayangan pada widget. |
-| `InkWell` | Membuat area dapat ditekan (tappable) dengan efek ripple. |
-| `Icon` | Menampilkan ikon dari pustaka Material Icons. |
-| `SnackBar` | Menampilkan pesan notifikasi sementara di bagian bawah layar. |
-| `ScaffoldMessenger` | Mengatur bagaimana `SnackBar` ditampilkan di dalam sebuah `Scaffold`. |
-| `Padding` | Memberikan jarak di sekitar widget child. |
-| `SizedBox` | Memberikan jarak atau ruang kosong antar widget. |
-
----
-
-## 3. Apa fungsi dari widget MaterialApp? Mengapa widget ini sering digunakan sebagai widget root?
-
-`MaterialApp` adalah widget yang mengatur **struktur dasar aplikasi Flutter** berbasis Material Design.  
-Fungsinya:
-- Menentukan tema global aplikasi (warna, font, ikon).
-- Mengatur **navigasi antar halaman (routes)**.
-- Menentukan **widget awal** yang akan ditampilkan (`home`).
-- Mengatur **localization**, **title**, dan **debug banner**.
-
-Widget ini sering digunakan sebagai **root** karena ia menjadi fondasi untuk semua elemen antarmuka berbasis Material Design — tanpa `MaterialApp`, banyak widget seperti `Scaffold` atau `SnackBar` tidak akan berfungsi dengan baik.
+- **`Navigator.pushReplacement()`** digunakan untuk:
+  - Navigasi dari **Drawer** ke **Halaman Utama**
+  - Menghindari penumpukan halaman yang sama di stack
+  - Ketika user memilih menu drawer, halaman saat ini diganti dengan halaman tujuan
+  
+  ```dart
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const MyHomePage()),
+  );
+  ```
 
 ---
 
-## 4. Jelaskan perbedaan antara StatelessWidget dan StatefulWidget. Kapan kamu memilih salah satunya?
+### 2. Bagaimana kamu memanfaatkan hierarchy widget seperti `Scaffold`, `AppBar`, dan `Drawer` untuk membangun struktur halaman yang konsisten di seluruh aplikasi?
 
-| Perbandingan | StatelessWidget | StatefulWidget |
-|---------------|----------------|----------------|
-| **Sifat** | Tidak memiliki state yang dapat berubah setelah dibuat. | Memiliki state yang dapat berubah selama aplikasi berjalan. |
-| **Contoh** | `Text`, `Icon`, `RaisedButton`. | `Checkbox`, `TextField`, `Slider`. |
-| **Rebuild** | Hanya dirender sekali (kecuali parent berubah). | Dapat di-render ulang ketika `setState()` dipanggil. |
-| **Penggunaan** | Ketika tampilan bersifat statis dan tidak berubah-ubah. | Ketika tampilan perlu bereaksi terhadap interaksi pengguna atau data yang dinamis. |
+Saya memanfaatkan hierarchy widget dengan cara berikut:
 
-Dalam tugas ini, saya menggunakan **StatelessWidget**, karena tampilan (tiga tombol dan informasi mahasiswa) bersifat **statis** dan tidak berubah berdasarkan interaksi kompleks.
+**1. Scaffold sebagai Struktur Dasar**
+- Digunakan di **semua halaman** (home page dan form page)
+- Menyediakan kerangka konsisten dengan `appBar`, `drawer`, dan `body`
+
+**2. AppBar untuk Navigasi Atas**
+- Menggunakan **warna yang sama** (`Colors.green`) di semua halaman
+- Style teks yang konsisten (putih, bold)
+- IconTheme putih untuk hamburger menu
+
+```dart
+AppBar(
+  title: const Text(
+    'Football Shop',
+    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+  ),
+  backgroundColor: Colors.green,
+  iconTheme: const IconThemeData(color: Colors.white),
+)
+```
+
+**3. Drawer untuk Menu Navigasi Global**
+- Dibuat sebagai **widget terpisah** (`LeftDrawer`) untuk reusability
+- Di-import dan digunakan di semua halaman yang memerlukan navigasi
+- Memiliki header dengan branding yang konsisten
+- Menu yang sama dapat diakses dari halaman mana pun
+
+```dart
+drawer: const LeftDrawer(),
+```
+
+**Keuntungan struktur ini:**
+- **Konsistensi visual** di seluruh aplikasi
+- **Mudah dimaintain** - perubahan di LeftDrawer otomatis berlaku di semua halaman
+- **User experience yang baik** - user tahu cara navigasi dari halaman mana pun
 
 ---
 
-## 5. Apa itu BuildContext dan mengapa penting di Flutter? Bagaimana penggunaannya di metode build?
+### 3. Dalam konteks desain antarmuka, apa kelebihan menggunakan layout widget seperti `Padding`, `SingleChildScrollView`, dan `ListView` saat menampilkan elemen-elemen form? Berikan contoh penggunaannya dari aplikasi kamu.
 
-`BuildContext` adalah **objek yang menghubungkan widget ke lokasi tertentu di dalam widget tree**.  
-Dengan `BuildContext`, widget dapat:
-- Mengakses informasi tentang posisi atau hubungan dengan widget lain.
-- Mengambil data dari widget induk seperti `Theme`, `MediaQuery`, atau `ScaffoldMessenger`.
-- Menampilkan elemen UI seperti `SnackBar`.
+**Kelebihan masing-masing widget:**
 
-Dalam metode `build(BuildContext context)`, objek `context` digunakan untuk:
-- Menampilkan `SnackBar` menggunakan `ScaffoldMessenger.of(context)`.
-- Mengetahui ukuran layar (`MediaQuery.of(context)`).
-- Mengambil tema dari `Theme.of(context)`.
+**1. Padding**
+- **Kelebihan**: Memberikan ruang/jarak di sekitar widget untuk tampilan yang lebih breathable
+- **Contoh di aplikasi**:
+  ```dart
+  body: Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      // Form elements
+    ),
+  )
+  ```
+  Memberikan margin 16 pixel di semua sisi form, sehingga tidak menempel di tepi layar.
+
+**2. SingleChildScrollView**
+- **Kelebihan**: 
+  - Membuat konten dapat di-scroll jika melebihi tinggi layar
+  - Mencegah overflow error pada layar kecil
+  - Memastikan semua elemen form tetap dapat diakses
+- **Contoh di aplikasi**:
+  ```dart
+  body: Form(
+    child: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // 6 input fields + button
+          ],
+        ),
+      ),
+    ),
+  )
+  ```
+  Memungkinkan user scroll untuk melihat semua field pada layar kecil atau saat keyboard muncul.
+
+**3. ListView**
+- **Kelebihan**:
+  - Efisien untuk menampilkan list panjang (lazy loading)
+  - Otomatis scrollable
+  - Cocok untuk data dinamis
+- **Contoh di aplikasi (Drawer)**:
+  ```dart
+  Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        DrawerHeader(...),
+        ListTile(...),
+        ListTile(...),
+      ],
+    ),
+  )
+  ```
+  Digunakan di drawer untuk menampilkan menu navigasi yang dapat bertambah seiring berkembangnya aplikasi.
+
+**Kombinasi yang powerful:**
+Menggunakan `Padding` + `SingleChildScrollView` + `Column` untuk form memastikan:
+- Form tidak menempel di tepi layar
+- Semua field dapat diakses meskipun layar kecil
+- User experience yang smooth saat mengisi form
 
 ---
 
-## 6. Jelaskan konsep "hot reload" di Flutter dan bagaimana bedanya dengan "hot restart".
+### 4. Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
 
-| Fitur | Hot Reload | Hot Restart |
-|--------|-------------|-------------|
-| **Tujuan** | Menyuntikkan perubahan kode ke dalam aplikasi yang sedang berjalan tanpa kehilangan state. | Menjalankan ulang seluruh aplikasi dari awal. |
-| **Kecepatan** | Cepat (dalam hitungan detik). | Lebih lambat karena aplikasi dijalankan ulang sepenuhnya. |
-| **State Aplikasi** | Dipertahankan. | Hilang (semua variabel kembali ke kondisi awal). |
-| **Kapan digunakan** | Saat hanya mengubah UI atau layout kecil. | Saat mengubah struktur utama aplikasi, variabel global, atau logika awal aplikasi. |
+Saya menggunakan **skema warna hijau** sebagai identitas utama Football Shop dengan strategi berikut:
 
-Hot reload sangat membantu saat melakukan iterasi cepat pada tampilan antarmuka tanpa kehilangan progress aplikasi.
+**1. Theme Global di MaterialApp**
+```dart
+theme: ThemeData(
+  colorScheme: ColorScheme.fromSwatch(
+    primarySwatch: Colors.green,
+  ).copyWith(secondary: Colors.tealAccent[400]),
+  useMaterial3: true,
+)
+```
+- **Primary color (hijau)**: Melambangkan lapangan sepak bola/rumput
+- **Secondary color (teal accent)**: Memberikan variasi tanpa keluar dari tema olahraga
+
+**2. Konsistensi di Seluruh Komponen**
+
+- **AppBar**: Background hijau dengan teks putih
+  ```dart
+  backgroundColor: Colors.green
+  ```
+
+- **Drawer Header**: Gradient hijau untuk efek modern
+  ```dart
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [Colors.green, Colors.green.shade700],
+    ),
+  )
+  ```
+
+- **Button "Save"**: Background hijau konsisten
+  ```dart
+  backgroundColor: Colors.green
+  ```
+
+- **Icon di Drawer**: Accent hijau untuk konsistensi
+  ```dart
+  leading: const Icon(Icons.home, color: Colors.green)
+  ```
+
+- **Checkbox**: Active color hijau
+  ```dart
+  activeColor: Colors.green
+  ```
+
+**3. Variasi Warna untuk Tombol Aksi**
+- Menggunakan warna berbeda untuk tombol berbeda (biru, hijau, merah) untuk membedakan fungsi
+- Namun tetap mempertahankan hijau sebagai warna dominan di navigasi dan branding
+
+**Hasil:**
+- **Brand identity yang kuat** dengan warna hijau konsisten
+- **Professional look** dengan Material Design 3
+- **User-friendly** karena konsistensi visual memudahkan navigasi
+- **Memorable** - user akan mengasosiasikan hijau dengan Football Shop
