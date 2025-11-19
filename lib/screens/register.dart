@@ -137,15 +137,24 @@ class _RegisterPageState extends State<RegisterPage> {
                       String password1 = _passwordController.text;
                       String password2 = _confirmPasswordController.text;
 
-                      // Ganti URL sesuai dengan deployment Django Anda
+                      // Cek validasi password
+                      if (password1 != password2) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Password tidak cocok!'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
                       final response = await request.postJson(
-                        "https://faishal-khoiriansyah-footballshop.pbp.cs.ui.ac.id/auth/register/",
-                        jsonEncode({
-                          "username": username,
-                          "password1": password1,
-                          "password2": password2,
-                        }),
-                      );
+                          "https://faishal-khoiriansyah-footballshop.pbp.cs.ui.ac.id/auth/register/",
+                          jsonEncode({
+                            "username": username,
+                            "password1": password1,
+                            "password2": password2,
+                          }));
 
                       if (context.mounted) {
                         if (response['status'] == 'success') {

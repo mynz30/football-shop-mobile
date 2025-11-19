@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:football_shop_mobile/models/product.dart';
 import 'package:football_shop_mobile/screens/product_detail.dart';
 import 'package:football_shop_mobile/widgets/left_drawer.dart';
@@ -12,7 +14,6 @@ class ProductEntryPage extends StatefulWidget {
 
 class _ProductEntryPageState extends State<ProductEntryPage> {
   Future<List<Product>> fetchProduct(CookieRequest request) async {
-    // Ganti URL sesuai dengan deployment Django Anda
     final response = await request.get(
       'https://faishal-khoiriansyah-footballshop.pbp.cs.ui.ac.id/json/',
     );
@@ -104,7 +105,6 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Product Image
                             ClipRRect(
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(12),
@@ -128,15 +128,12 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
                                 },
                               ),
                             ),
-                            
-                            // Product Info
                             Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.all(12.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Category Badge
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 8,
@@ -155,8 +152,6 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
                                       ),
                                     ),
                                     const SizedBox(height: 8),
-                                    
-                                    // Product Name
                                     Text(
                                       product.name,
                                       style: const TextStyle(
@@ -167,8 +162,6 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     const SizedBox(height: 4),
-                                    
-                                    // Brand
                                     if (product.brand != null)
                                       Text(
                                         product.brand!,
@@ -178,8 +171,6 @@ class _ProductEntryPageState extends State<ProductEntryPage> {
                                         ),
                                       ),
                                     const Spacer(),
-                                    
-                                    // Price
                                     Text(
                                       'Rp ${product.price}',
                                       style: const TextStyle(

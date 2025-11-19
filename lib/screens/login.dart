@@ -4,6 +4,28 @@ import 'package:provider/provider.dart';
 import 'package:football_shop_mobile/menu.dart';
 import 'package:football_shop_mobile/screens/register.dart';
 
+void main() {
+  runApp(const LoginApp());
+}
+
+class LoginApp extends StatelessWidget {
+  const LoginApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Login',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.green,
+        ).copyWith(secondary: Colors.greenAccent[400]),
+      ),
+      home: const LoginPage(),
+    );
+  }
+}
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -89,17 +111,12 @@ class _LoginPageState extends State<LoginPage> {
                       String username = _usernameController.text;
                       String password = _passwordController.text;
 
-                      // Ganti URL sesuai dengan deployment Django Anda
-                      // Untuk testing lokal: http://127.0.0.1:8000
-                      // Untuk Android Emulator: http://10.0.2.2:8000
-                      // Untuk deployment: https://your-app.com
-                      final response = await request.login(
-                        "https://faishal-khoiriansyah-footballshop.pbp.cs.ui.ac.id/auth/login/",
-                        {
-                          'username': username,
-                          'password': password,
-                        },
-                      );
+                      // Cek kredensial
+                      final response = await request
+                          .login("https://faishal-khoiriansyah-footballshop.pbp.cs.ui.ac.id/auth/login/", {
+                        'username': username,
+                        'password': password,
+                      });
 
                       if (request.loggedIn) {
                         String message = response['message'];
@@ -108,16 +125,14 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MyHomePage(),
-                            ),
+                                builder: (context) => const MyHomePage()),
                           );
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
                             ..showSnackBar(
                               SnackBar(
-                                content: Text("$message Selamat datang, $uname."),
-                                backgroundColor: Colors.green,
-                              ),
+                                  content:
+                                      Text("$message Selamat datang, $uname.")),
                             );
                         }
                       } else {
