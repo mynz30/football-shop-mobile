@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:football_shop_mobile/widgets/left_drawer.dart';
 import 'package:football_shop_mobile/screens/productentry_form.dart';
 import 'package:football_shop_mobile/screens/my_products.dart';
+import 'package:football_shop_mobile/screens/list_productentry.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
@@ -59,13 +60,12 @@ class MyHomePage extends StatelessWidget {
                   icon: Icons.list,
                   color: Colors.blue,
                   onTap: () {
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(
-                        const SnackBar(
-                          content: Text("Kamu telah menekan tombol All Products"),
-                        ),
-                      );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProductEntryPage(),
+                      ),
+                    );
                   },
                 ),
 
@@ -101,80 +101,6 @@ class MyHomePage extends StatelessWidget {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// Kartu Info Mahasiswa
-class InfoCard extends StatelessWidget {
-  final String title;
-  final String content;
-
-  const InfoCard({super.key, required this.title, required this.content});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2.0,
-      child: Container(
-        width: MediaQuery.of(context).size.width / 3.8,
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(content),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Widget Tombol (Card Item)
-class ItemCard extends StatelessWidget {
-  final String name;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  const ItemCard({
-    super.key,
-    required this.name,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: color,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: Colors.white, size: 32),
-                const SizedBox(height: 8),
-                Text(
-                  name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
