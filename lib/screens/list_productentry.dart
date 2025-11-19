@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:provider/provider.dart';
 import 'package:football_shop_mobile/models/product.dart';
 import 'package:football_shop_mobile/screens/product_detail.dart';
 import 'package:football_shop_mobile/widgets/left_drawer.dart';

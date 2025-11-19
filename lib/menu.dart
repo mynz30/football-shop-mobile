@@ -54,7 +54,6 @@ class MyHomePage extends StatelessWidget {
               mainAxisSpacing: 12,
               shrinkWrap: true,
               children: [
-                // Tombol All Products
                 ItemCard(
                   name: "All Products",
                   icon: Icons.list,
@@ -68,8 +67,6 @@ class MyHomePage extends StatelessWidget {
                     );
                   },
                 ),
-
-                // Tombol My Products
                 ItemCard(
                   name: "My Products",
                   icon: Icons.shopping_bag,
@@ -83,8 +80,6 @@ class MyHomePage extends StatelessWidget {
                     );
                   },
                 ),
-
-                // Tombol Create Product
                 ItemCard(
                   name: "Create Product",
                   icon: Icons.add_box,
@@ -101,6 +96,82 @@ class MyHomePage extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// Widget InfoCard
+class InfoCard extends StatelessWidget {
+  final String title;
+  final String content;
+
+  const InfoCard({super.key, required this.title, required this.content});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2.0,
+      child: Container(
+        width: MediaQuery.of(context).size.width / 3.5,
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            Text(content),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Widget ItemCard
+class ItemCard extends StatelessWidget {
+  final String name;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const ItemCard({
+    super.key,
+    required this.name,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: color,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 30.0,
+                ),
+                const Padding(padding: EdgeInsets.all(3)),
+                Text(
+                  name,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

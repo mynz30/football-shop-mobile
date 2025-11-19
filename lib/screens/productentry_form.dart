@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:football_shop_mobile/widgets/left_drawer.dart';
+import 'package:football_shop_mobile/menu.dart';
 
 class ProductEntryFormPage extends StatefulWidget {
   const ProductEntryFormPage({super.key});
@@ -16,10 +20,11 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
   String _thumbnail = "";
   String _brand = "";
   String _category = "";
-  String? _jenisProduct; // Nullable untuk dropdown
+  String? _jenisProduct;
   bool _isFeatured = false;
+  int _stock = 0;
+  double _rating = 0.0;
 
-  // List jenis produk
   final List<String> _jenisProductList = [
     'Jersey',
     'Bola',
@@ -29,6 +34,8 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -99,12 +106,6 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                     if (value == null || value.isEmpty) {
                       return "Brand tidak boleh kosong!";
                     }
-                    if (value.length < 2) {
-                      return "Brand minimal 2 karakter!";
-                    }
-                    if (value.length > 50) {
-                      return "Brand maksimal 50 karakter!";
-                    }
                     return null;
                   },
                 ),
@@ -168,8 +169,68 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                     if (int.parse(value) <= 0) {
                       return "Harga harus lebih dari 0!";
                     }
-                    if (int.parse(value) > 1000000000) {
-                      return "Harga terlalu besar!";
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Input Stock
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: "Stock",
+                    hintText: "Masukkan jumlah stock",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    prefixIcon: const Icon(Icons.inventory),
+                  ),
+                  keyboardType: TextInputType.number,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _stock = int.tryParse(value!) ?? 0;
+                    });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Stock tidak boleh kosong!";
+                    }
+                    if (int.tryParse(value) == null) {
+                      return "Stock harus berupa angka!";
+                    }
+                    if (int.parse(value) < 0) {
+                      return "Stock tidak boleh negatif!";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Input Rating
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: "Rating",
+                    hintText: "Masukkan rating (0.0 - 5.0)",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    prefixIcon: const Icon(Icons.star),
+                  ),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (String? value) {
+                    setState(() {
+                      _rating = double.tryParse(value!) ?? 0.0;
+                    });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Rating tidak boleh kosong!";
+                    }
+                    double? rating = double.tryParse(value);
+                    if (rating == null) {
+                      return "Rating harus berupa angka!";
+                    }
+                    if (rating < 0 || rating > 5) {
+                      return "Rating harus antara 0.0 - 5.0!";
                     }
                     return null;
                   },
@@ -200,9 +261,6 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                     if (value.length < 10) {
                       return "Deskripsi minimal 10 karakter!";
                     }
-                    if (value.length > 500) {
-                      return "Deskripsi maksimal 500 karakter!";
-                    }
                     return null;
                   },
                 ),
@@ -227,13 +285,12 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                     if (value == null || value.isEmpty) {
                       return "URL thumbnail tidak boleh kosong!";
                     }
-                    // Validasi format URL sederhana
                     final urlPattern = RegExp(
                       r'^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$',
                       caseSensitive: false,
                     );
                     if (!urlPattern.hasMatch(value)) {
-                      return "URL harus berupa link gambar yang valid (jpg, jpeg, png, gif, webp)!";
+                      return "URL harus berupa link gambar yang valid!";
                     }
                     return null;
                   },
@@ -258,12 +315,6 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
                       return "Kategori tidak boleh kosong!";
-                    }
-                    if (value.length < 3) {
-                      return "Kategori minimal 3 karakter!";
-                    }
-                    if (value.length > 50) {
-                      return "Kategori maksimal 50 karakter!";
                     }
                     return null;
                   },
@@ -314,58 +365,47 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Produk Berhasil Disimpan'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text('Nama: $_name'),
-                                    const SizedBox(height: 8),
-                                    Text('Brand: $_brand'),
-                                    const SizedBox(height: 8),
-                                    Text('Jenis Produk: $_jenisProduct'),
-                                    const SizedBox(height: 8),
-                                    Text('Harga: Rp $_price'),
-                                    const SizedBox(height: 8),
-                                    Text('Deskripsi: $_description'),
-                                    const SizedBox(height: 8),
-                                    Text('Thumbnail: $_thumbnail'),
-                                    const SizedBox(height: 8),
-                                    Text('Kategori: $_category'),
-                                    const SizedBox(height: 8),
-                                    Text('Produk Unggulan: ${_isFeatured ? "Ya" : "Tidak"}'),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _formKey.currentState!.reset();
-                                    setState(() {
-                                      _name = "";
-                                      _price = 0;
-                                      _description = "";
-                                      _thumbnail = "";
-                                      _brand = "";
-                                      _category = "";
-                                      _jenisProduct = null;
-                                      _isFeatured = false;
-                                    });
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                        // Kirim ke Django
+                        final response = await request.postJson(
+                          "https://faishal-khoiriansyah-footballshop.pbp.cs.ui.ac.id/create-flutter/",
+                          jsonEncode(<String, dynamic>{
+                            'name': _name,
+                            'price': _price.toString(),
+                            'description': _description,
+                            'thumbnail': _thumbnail,
+                            'category': _category,
+                            'is_featured': _isFeatured,
+                            'stock': _stock.toString(),
+                            'brand': _brand,
+                            'rating': _rating.toString(),
+                          }),
                         );
+
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Produk berhasil disimpan!"),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MyHomePage(),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Terjadi kesalahan: ${response['message']}"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
                     child: const Row(
